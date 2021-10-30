@@ -1,4 +1,4 @@
-from logger import LRLogger
+from .logger import LRLogger
 from functools import wraps
 
 
@@ -11,6 +11,7 @@ def _save_val_preds(logger, preds_val, extra_params, kfold, i_fold):
                         n_splits * n_examles в других случаях
     '''
 
+    #TODO: make automatic label type definition
     if extra_params['objective'] == 'multy':
         logger.save_val_preds(preds_val[i_fold], i_fold)
     elif i_fold == kfold.n_splits-1:
@@ -31,7 +32,8 @@ def common_logging(func):
             _save_val_preds(logger, preds_val, kwargs['extra_params'], kwargs['kfold'], i_fold)
             logger.save_model(model_lst[i_fold], i_fold)
             if (kwargs['val'] is not None) & (kwargs['val_labels'] is not None):
-                logger.calc_metric(kwargs['metric'], preds_val[i_fold, :, :], kwargs['val_labels'].values)
+                #TODO: generalize to multyclass
+                logger.calc_metric(kwargs['metric'], preds_val[i_fold, :], kwargs['val_labels'].values)
 
         logger.save_train_preds(preds_train)
         logger.save_params(kwargs['lr_params'], kwargs['extra_params'], kwargs['log_params'])
